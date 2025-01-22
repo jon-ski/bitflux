@@ -11,7 +11,7 @@ var (
 
 // Buffer wraps `bytes.Buffer` and provides serialization methods on top of it.
 type Buffer struct {
-	buf *bytes.Buffer
+	buf bytes.Buffer
 	err error // Latest/Last Error
 }
 
@@ -19,7 +19,7 @@ type Buffer struct {
 // Useful as a reader on an existing buffer.
 func NewBuffer(buf []byte) *Buffer {
 	return &Buffer{
-		buf: bytes.NewBuffer(buf),
+		buf: *bytes.NewBuffer(buf),
 	}
 }
 
