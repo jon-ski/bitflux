@@ -5,19 +5,27 @@ import (
 )
 
 var (
-	Le = new(le)
-	Be = new(be)
+	Le = new(le) // Little-Endian functions
+	Be = new(be) // Big-Endian functions
 )
 
+// Buffer wraps `bytes.Buffer` and provides serialization methods on top of it.
 type Buffer struct {
 	buf *bytes.Buffer
 	err error // Latest/Last Error
 }
 
+// NewBuffer creates an initialized internal buffer from `buf`.
+// Useful as a reader on an existing buffer.
 func NewBuffer(buf []byte) *Buffer {
 	return &Buffer{
 		buf: bytes.NewBuffer(buf),
 	}
+}
+
+// Err returns an error if an error has occurred on the buffer
+func (b *Buffer) Err() error {
+	return b.err
 }
 
 func (b *Buffer) Write(p []byte) (n int, err error) {
