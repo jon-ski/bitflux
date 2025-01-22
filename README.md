@@ -32,8 +32,12 @@ func main() {
   var buf bitflux.Buffer
   buf.WriteLUint16(1_234) // Little-Endian 16-bit 1234 (0xd2, 0x04)
   buf.WriteBUint32(78_910) // Little-Endian 32-bit 78910 (0x00, 0x01, 0x34, 0x3e)
-  if err != nil {
-    log.Fatalf("unexpected error: %w", err)
+  if buf.err != nil {
+    // buf will keep track of the last error and will
+    // nop on new calls if an error has occurred
+    // 
+    // Alternatively, functions that can error return an error.
+    log.Fatalf("unexpected error: %w", buf.err)
   }
   fmt.Printf("% 2x\n", buf.Bytes())
 }
