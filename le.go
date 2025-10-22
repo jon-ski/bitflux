@@ -5,14 +5,17 @@ import (
 	"math"
 )
 
+// Deprecated: Use EncLE/DecLE instead. le will be removed in a future version.
 type le struct{}
 
+// Deprecated: Use EncLE/DecLE instead. WriteUint8 will be removed in a future version.
 func (c le) WriteUint8(v uint8) []byte {
 	return []byte{
 		byte(v),
 	}
 }
 
+// Deprecated: Use EncLE/DecLE instead. WriteUint16 will be removed in a future version.
 func (c le) WriteUint16(v uint16) []byte {
 	return []byte{
 		byte(v),
@@ -20,6 +23,7 @@ func (c le) WriteUint16(v uint16) []byte {
 	}
 }
 
+// Deprecated: Use EncLE/DecLE instead. WriteUint32 will be removed in a future version.
 func (c le) WriteUint32(v uint32) []byte {
 	return []byte{
 		byte(v),
@@ -29,6 +33,7 @@ func (c le) WriteUint32(v uint32) []byte {
 	}
 }
 
+// Deprecated: Use EncLE/DecLE instead. WriteUint64 will be removed in a future version.
 func (c le) WriteUint64(v uint64) []byte {
 	return []byte{
 		byte(v),
@@ -42,12 +47,14 @@ func (c le) WriteUint64(v uint64) []byte {
 	}
 }
 
+// Deprecated: Use EncLE/DecLE instead. WriteInt8 will be removed in a future version.
 func (c le) WriteInt8(v int8) []byte {
 	return []byte{
 		byte(v),
 	}
 }
 
+// Deprecated: Use EncLE/DecLE instead. WriteInt16 will be removed in a future version.
 func (c le) WriteInt16(v int16) []byte {
 	return []byte{
 		byte(v),
@@ -55,6 +62,7 @@ func (c le) WriteInt16(v int16) []byte {
 	}
 }
 
+// Deprecated: Use EncLE/DecLE instead. WriteInt32 will be removed in a future version.
 func (c le) WriteInt32(v int32) []byte {
 	return []byte{
 		byte(v),
@@ -64,6 +72,7 @@ func (c le) WriteInt32(v int32) []byte {
 	}
 }
 
+// Deprecated: Use EncLE/DecLE instead. WriteInt64 will be removed in a future version.
 func (c le) WriteInt64(v int64) []byte {
 	return []byte{
 		byte(v),
@@ -77,14 +86,17 @@ func (c le) WriteInt64(v int64) []byte {
 	}
 }
 
+// Deprecated: Use EncLE/DecLE instead. WriteFloat32 will be removed in a future version.
 func (c le) WriteFloat32(v float32) []byte {
 	return c.WriteUint32(math.Float32bits(v))
 }
 
+// Deprecated: Use EncLE/DecLE instead. WriteFloat64 will be removed in a future version.
 func (c le) WriteFloat64(v float64) []byte {
 	return c.WriteUint64(math.Float64bits(v))
 }
 
+// Deprecated: Use EncLE/DecLE instead. ReadUint8 will be removed in a future version.
 func (c le) ReadUint8(r io.Reader) (uint8, error) {
 	buf := make([]byte, 1)
 	_, err := r.Read(buf)
@@ -94,6 +106,7 @@ func (c le) ReadUint8(r io.Reader) (uint8, error) {
 	return buf[0], nil
 }
 
+// Deprecated: Use EncLE/DecLE instead. ReadUint16 will be removed in a future version.
 func (c le) ReadUint16(r io.Reader) (uint16, error) {
 	buf := make([]byte, 2)
 	if _, err := io.ReadFull(r, buf); err != nil {
@@ -102,6 +115,7 @@ func (c le) ReadUint16(r io.Reader) (uint16, error) {
 	return uint16(buf[0]) | uint16(buf[1])<<8, nil
 }
 
+// Deprecated: Use EncLE/DecLE instead. ReadUint32 will be removed in a future version.
 func (c le) ReadUint32(r io.Reader) (uint32, error) {
 	buf := make([]byte, 4)
 	if _, err := io.ReadFull(r, buf); err != nil {
@@ -113,6 +127,7 @@ func (c le) ReadUint32(r io.Reader) (uint32, error) {
 		uint32(buf[3])<<24), nil
 }
 
+// Deprecated: Use EncLE/DecLE instead. ReadUint64 will be removed in a future version.
 func (c le) ReadUint64(r io.Reader) (uint64, error) {
 	buf := make([]byte, 8)
 	if _, err := io.ReadFull(r, buf); err != nil {
@@ -128,6 +143,7 @@ func (c le) ReadUint64(r io.Reader) (uint64, error) {
 		uint64(buf[7])<<56), nil
 }
 
+// Deprecated: Use EncLE/DecLE instead. ReadInt8 will be removed in a future version.
 func (c le) ReadInt8(r io.Reader) (int8, error) {
 	buf := make([]byte, 1)
 	_, err := r.Read(buf)
@@ -137,6 +153,7 @@ func (c le) ReadInt8(r io.Reader) (int8, error) {
 	return int8(buf[0]), nil
 }
 
+// Deprecated: Use EncLE/DecLE instead. ReadInt16 will be removed in a future version.
 func (c le) ReadInt16(r io.Reader) (int16, error) {
 	buf := make([]byte, 2)
 	if _, err := io.ReadFull(r, buf); err != nil {
@@ -145,6 +162,7 @@ func (c le) ReadInt16(r io.Reader) (int16, error) {
 	return int16(buf[0]) | int16(buf[1])<<8, nil
 }
 
+// Deprecated: Use EncLE/DecLE instead. ReadInt32 will be removed in a future version.
 func (c le) ReadInt32(r io.Reader) (int32, error) {
 	buf := make([]byte, 4)
 	if _, err := io.ReadFull(r, buf); err != nil {
@@ -156,6 +174,7 @@ func (c le) ReadInt32(r io.Reader) (int32, error) {
 		int32(buf[3])<<24), nil
 }
 
+// Deprecated: Use EncLE/DecLE instead. ReadInt64 will be removed in a future version.
 func (c le) ReadInt64(r io.Reader) (int64, error) {
 	buf := make([]byte, 8)
 	if _, err := io.ReadFull(r, buf); err != nil {
@@ -171,6 +190,7 @@ func (c le) ReadInt64(r io.Reader) (int64, error) {
 		int64(buf[7])<<56), nil
 }
 
+// Deprecated: Use EncLE/DecLE instead. ReadFloat32 will be removed in a future version.
 func (c le) ReadFloat32(r io.Reader) (float32, error) {
 	buf, err := c.ReadUint32(r)
 	if err != nil {
@@ -179,6 +199,7 @@ func (c le) ReadFloat32(r io.Reader) (float32, error) {
 	return math.Float32frombits(buf), nil
 }
 
+// Deprecated: Use EncLE/DecLE instead. ReadFloat64 will be removed in a future version.
 func (c le) ReadFloat64(r io.Reader) (float64, error) {
 	buf, err := c.ReadUint64(r)
 	if err != nil {
