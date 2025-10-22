@@ -96,6 +96,7 @@ func (e *EncLE) Write(p []byte) {
 	e.push(p)
 }
 
+// Calls a WriteTo on a WriterTo and updates N/Err state
 func (e *EncLE) To(w io.WriterTo) {
 	if e.Err != nil {
 		return
@@ -107,6 +108,7 @@ func (e *EncLE) To(w io.WriterTo) {
 	}
 }
 
+// Calls Marshal on a BinaryMarshaler and udpates N/Err state
 func (e *EncLE) Marshal(m encoding.BinaryMarshaler) {
 	if e.Err != nil {
 		return
