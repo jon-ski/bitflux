@@ -2,12 +2,21 @@ package bitflux
 
 import (
 	"bytes"
+	"encoding"
+	"io"
 )
 
 var (
 	Le = new(le) // Little-Endian functions
 	Be = new(be) // Big-Endian functions
 )
+
+var _ io.Reader = &Buffer{}
+var _ io.Writer = &Buffer{}
+var _ io.ByteReader = &Buffer{}
+var _ io.ByteWriter = &Buffer{}
+var _ io.ReaderFrom = &Buffer{}
+var _ io.WriterTo = &Buffer{}
 
 // Buffer wraps `bytes.Buffer` and provides serialization methods on top of it.
 type Buffer struct {
@@ -26,6 +35,12 @@ func NewBuffer(buf []byte) *Buffer {
 // Err returns an error if an error has occurred on the buffer
 func (b *Buffer) Err() error {
 	return b.err
+}
+
+func (b *Buffer) setErr(err error) {
+	if err != nil && err != io.EOF {
+		b.err = err
+	}
 }
 
 // Write writes the contents of p to the underlying buffer.
@@ -207,4 +222,52 @@ func (b *Buffer) ReadLFloat64() (float64, error) {
 // ReadBFloat64 reads a float64 (big-endian) from the underlying buffer.
 func (b *Buffer) ReadBFloat64() (float64, error) {
 	return Be.ReadFloat64(b)
+}
+
+// --- io.ReaderFrom / io.WriterTo ---
+
+func (b *Buffer) ReadFrom(r io.Reader) (int64, error) {
+	if b.err != nil {
+		return 0, b.err
+	}
+	n, err := b.buf.ReadFrom(r)
+	b.setErr(err)
+	return n, err
+}
+
+func (b *Buffer) WriteTo(w io.Writer) (int64, error) {
+	// bytes.Buffer.WriteTo ignores b.err. Keep sticky behavior consistent.
+	if b.err != nil {
+		return 0, b.err
+	}
+	return b.buf.WriteTo(w)
+}
+
+// --- binary marshaling helpers ---
+
+// WriteBinary writes raw MarshalBinary bytes. No length prefix.
+func (b *Buffer) WriteBinary(m encoding.BinaryMarshaler) error {
+	if b.err != nil {
+		return b.err
+	}
+	data, err := m.MarshalBinary()
+	if err != nil {
+		b.setErr(err)
+		return err
+	}
+	_, err = b.Write(data)
+	return err
+}
+
+// ReadBinary reads exactly n bytes and calls UnmarshalBinary.
+func (b *Buffer) ReadBinary(u encoding.BinaryUnmarshaler, n int) error {
+	if b.err != nil {
+		return b.err
+	}
+	buf := make([]byte, n)
+	if _, err := io.ReadFull(b, buf); err != nil {
+		b.setErr(err)
+		return err
+	}
+	return u.UnmarshalBinary(buf)
 }
