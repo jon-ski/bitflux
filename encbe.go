@@ -1,6 +1,7 @@
 package bitflux
 
 import (
+	"bytes"
 	"encoding"
 	"io"
 	"math"
@@ -13,6 +14,23 @@ type EncBE struct {
 }
 
 func NewEncBE(w io.Writer) *EncBE { return &EncBE{W: w} }
+
+// Convenience constructors for common use cases
+
+// NewEncBEFromBytes creates an encoder that writes to a buffer initialized with existing data
+func NewEncBEFromBytes(data []byte) *EncBE {
+	return NewEncBE(bytes.NewBuffer(data))
+}
+
+// NewEncBEBuffer creates an encoder that writes to a new bytes.Buffer
+func NewEncBEBuffer() *EncBE {
+	return NewEncBE(&bytes.Buffer{})
+}
+
+// NewEncBEWithCapacity creates an encoder that writes to a buffer with pre-allocated capacity
+func NewEncBEWithCapacity(cap int) *EncBE {
+	return NewEncBE(bytes.NewBuffer(make([]byte, 0, cap)))
+}
 
 func (e *EncBE) push(p []byte) {
 	if e.Err != nil || len(p) == 0 {
