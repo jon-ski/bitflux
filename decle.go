@@ -6,14 +6,19 @@ import (
 	"math"
 )
 
+// DecLE is a little-endian binary decoder that reads data from an io.Reader.
+// It tracks the number of bytes read and any errors that occur during decoding.
 type DecLE struct {
-	R   io.Reader
-	N   int64
-	Err error
+	R   io.Reader // The underlying reader to decode data from
+	N   int64     // Number of bytes read
+	Err error     // First error encountered during decoding
 }
 
+// NewDecLE creates a new little-endian decoder that reads from the provided io.Reader.
 func NewDecLE(r io.Reader) *DecLE { return &DecLE{R: r} }
 
+// pull reads the provided byte slice from the underlying reader using io.ReadFull.
+// It tracks the number of bytes read and any errors that occur.
 func (d *DecLE) pull(p []byte) {
 	if d.Err != nil {
 		return
@@ -25,24 +30,28 @@ func (d *DecLE) pull(p []byte) {
 	}
 }
 
+// U8 decodes a uint8 value from little-endian format.
 func (d *DecLE) U8() uint8 {
 	var b [1]byte
 	d.pull(b[:])
 	return b[0]
 }
 
+// U16 decodes a uint16 value from little-endian format.
 func (d *DecLE) U16() uint16 {
 	var b [2]byte
 	d.pull(b[:])
 	return uint16(b[0]) | uint16(b[1])<<8
 }
 
+// U32 decodes a uint32 value from little-endian format.
 func (d *DecLE) U32() uint32 {
 	var b [4]byte
 	d.pull(b[:])
 	return uint32(b[0]) | uint32(b[1])<<8 | uint32(b[2])<<16 | uint32(b[3])<<24
 }
 
+// U64 decodes a uint64 value from little-endian format.
 func (d *DecLE) U64() uint64 {
 	var b [8]byte
 	d.pull(b[:])
@@ -56,25 +65,33 @@ func (d *DecLE) U64() uint64 {
 		uint64(b[7])<<56
 }
 
+// I8 decodes an int8 value from little-endian format.
 func (d *DecLE) I8() int8 {
 	return int8(d.U8())
 }
 
+// I16 decodes an int16 value from little-endian format.
 func (d *DecLE) I16() int16 {
 	return int16(d.U16())
 }
 
+// I32 decodes an int32 value from little-endian format.
 func (d *DecLE) I32() int32 {
 	return int32(d.U32())
 }
 
+// I64 decodes an int64 value from little-endian format.
 func (d *DecLE) I64() int64 {
 	return int64(d.U64())
 }
 
+// F32 decodes a float32 value from little-endian format using IEEE 754 representation.
 func (d *DecLE) F32() float32 { return math.Float32frombits(d.U32()) }
+
+// F64 decodes a float64 value from little-endian format using IEEE 754 representation.
 func (d *DecLE) F64() float64 { return math.Float64frombits(d.U64()) }
 
+// Bytes reads n bytes from the decoder and returns them as a byte slice.
 func (d *DecLE) Bytes(n int) []byte {
 	if n <= 0 {
 		return nil
@@ -84,7 +101,7 @@ func (d *DecLE) Bytes(n int) []byte {
 	return buf
 }
 
-// Skip discards n bytes
+// Skip discards n bytes from the decoder without storing them.
 func (d *DecLE) Skip(n int) {
 	if n <= 0 || d.Err != nil {
 		return
@@ -97,7 +114,7 @@ func (d *DecLE) Skip(n int) {
 	}
 }
 
-// FromRF reads via x.ReadFrom and adds to N.
+// FromRF calls ReadFrom on the provided ReaderFrom and updates the decoder's byte count and error state.
 func (d *DecLE) FromRF(r io.ReaderFrom) {
 	if d.Err != nil {
 		return
@@ -109,7 +126,8 @@ func (d *DecLE) FromRF(r io.ReaderFrom) {
 	}
 }
 
-// Unmarshal reads n bytes and calls UnmarshalBinary.
+// Unmarshal reads n bytes and calls UnmarshalBinary on the provided BinaryUnmarshaler.
+// It updates the decoder's error state if unmarshaling fails.
 func (d *DecLE) Unmarshal(u encoding.BinaryUnmarshaler, n int) {
 	if d.Err != nil {
 		return

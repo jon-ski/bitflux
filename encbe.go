@@ -7,12 +7,15 @@ import (
 	"math"
 )
 
+// EncBE is a big-endian binary encoder that writes data to an io.Writer.
+// It tracks the number of bytes written and any errors that occur during encoding.
 type EncBE struct {
-	W   io.Writer
-	N   int64
-	Err error
+	W   io.Writer // The underlying writer to encode data to
+	N   int64     // Number of bytes written
+	Err error     // First error encountered during encoding
 }
 
+// NewEncBE creates a new big-endian encoder that writes to the provided io.Writer.
 func NewEncBE(w io.Writer) *EncBE { return &EncBE{W: w} }
 
 // Convenience constructors for common use cases
@@ -32,6 +35,8 @@ func NewEncBEWithCapacity(cap int) *EncBE {
 	return NewEncBE(bytes.NewBuffer(make([]byte, 0, cap)))
 }
 
+// push writes the provided byte slice to the underlying writer.
+// It handles partial writes and tracks the number of bytes written and any errors.
 func (e *EncBE) push(p []byte) {
 	if e.Err != nil || len(p) == 0 {
 		return
@@ -51,12 +56,14 @@ func (e *EncBE) push(p []byte) {
 	}
 }
 
+// U8 encodes a uint8 value in big-endian format.
 func (e *EncBE) U8(v uint8) {
 	var b [1]byte
 	b[0] = byte(v)
 	e.push(b[:])
 }
 
+// U16 encodes a uint16 value in big-endian format.
 func (e *EncBE) U16(v uint16) {
 	var b [2]byte
 	b[1] = byte(v)
@@ -64,6 +71,7 @@ func (e *EncBE) U16(v uint16) {
 	e.push(b[:])
 }
 
+// U32 encodes a uint32 value in big-endian format.
 func (e *EncBE) U32(v uint32) {
 	var b [4]byte
 	b[3] = byte(v)
@@ -73,6 +81,7 @@ func (e *EncBE) U32(v uint32) {
 	e.push(b[:])
 }
 
+// U64 encodes a uint64 value in big-endian format.
 func (e *EncBE) U64(v uint64) {
 	var b [8]byte
 	b[7] = byte(v)
@@ -86,35 +95,42 @@ func (e *EncBE) U64(v uint64) {
 	e.push(b[:])
 }
 
+// I8 encodes an int8 value in big-endian format.
 func (e *EncBE) I8(v int8) {
 	e.U8(uint8(v))
 }
 
+// I16 encodes an int16 value in big-endian format.
 func (e *EncBE) I16(v int16) {
 	e.U16(uint16(v))
 }
 
+// I32 encodes an int32 value in big-endian format.
 func (e *EncBE) I32(v int32) {
 	e.U32(uint32(v))
 }
 
+// I64 encodes an int64 value in big-endian format.
 func (e *EncBE) I64(v int64) {
 	e.U64(uint64(v))
 }
 
+// F32 encodes a float32 value in big-endian format using IEEE 754 representation.
 func (e *EncBE) F32(v float32) {
 	e.U32(math.Float32bits(v))
 }
 
+// F64 encodes a float64 value in big-endian format using IEEE 754 representation.
 func (e *EncBE) F64(v float64) {
 	e.U64(math.Float64bits(v))
 }
 
+// Write writes raw bytes to the encoder.
 func (e *EncBE) Write(p []byte) {
 	e.push(p)
 }
 
-// Calls a WriteTo on a WriterTo and updates N/Err state
+// To calls WriteTo on the provided WriterTo and updates the encoder's byte count and error state.
 func (e *EncBE) To(w io.WriterTo) {
 	if e.Err != nil {
 		return
@@ -126,7 +142,8 @@ func (e *EncBE) To(w io.WriterTo) {
 	}
 }
 
-// Calls Marshal on a BinaryMarshaler and udpates N/Err state
+// Marshal calls MarshalBinary on the provided BinaryMarshaler and writes the result to the encoder.
+// It updates the encoder's byte count and error state.
 func (e *EncBE) Marshal(m encoding.BinaryMarshaler) {
 	if e.Err != nil {
 		return
