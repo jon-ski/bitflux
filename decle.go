@@ -140,3 +140,17 @@ func (d *DecLE) Unmarshal(u encoding.BinaryUnmarshaler, n int) {
 		d.Err = err
 	}
 }
+
+// ReadAll reads all remaining bytes from the decoder until EOF.
+// It updates the decoder's byte count and error state.
+func (d *DecLE) ReadAll() []byte {
+	if d.Err != nil {
+		return nil
+	}
+	data, err := io.ReadAll(d.R)
+	d.N += int64(len(data))
+	if err != nil && err != io.EOF {
+		d.Err = err
+	}
+	return data
+}
